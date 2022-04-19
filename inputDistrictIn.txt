@@ -1,0 +1,32 @@
+The format of data files
+
+The first line contains the following information:
+
+	M N dmaxT τ 
+
+Where
+
+ M =  number of districts to design.
+ N =  number of basic units considered.
+ dmaxT = Maximum distance allowed between two basic units that can be assigned to the same district.
+ τ =  Admissible percentage deviation of the workload associated to a given district in comparison with the average workload among all districts.
+ eik = Compatibility index. eik=1 if the basic units i and k are compatible, and 0 otherwise. The basic units i and k can be incompatible for several reasons: a) existence of geographical obstacles between them, b) difficulty or impossibility to travel from one basic unit to another by the means of transportation used by the caregivers (public transportation, private cars, etc.) or c) they do not belong to the same administrative district.
+ dik = Distance between the basic units i (i=1…N) and k (k=1…N).
+ adik = Adjacency index of the basic units i (i=1…N) and k (k=1…N).
+
+The next N lines contain, for each basic unit, the following information:
+ 	
+	id la lo np
+where	
+	id = Id of basic unit
+	la = Latitude of patient
+	lo = Longitude of patient
+	wl = workload of the basic unit i
+
+
+eik:  The next N lines contain the Compatibility index (0,1) of each basic unit with the rest of basic units (NxN):
+
+dik:  The next N lines contain the Distance between each pair of the basic units (NxN):
+
+adik: The next N lines contain the adjacency index (0,1) of each basic unit with the rest of basic units (NxN):
+
