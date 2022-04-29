@@ -23,6 +23,8 @@ if __name__ == "__main__":
 
     # print(instance.adjacencies)
 
-    solution = Solution(instance)
-    solution.createSolution()
+    solution = Solution(instance, 7)
+    solution.createEmptySolution()
+
+    # solution.createSolution()
     solution.printInfoSolution()
