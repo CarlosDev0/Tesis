@@ -339,117 +339,123 @@ class Adjacency:
 
 
 class Solution:
+    districtMatrix = []
+
+
+class RandomSolver:
     pvr = SynConPVRP
     q = int
-    d1 = District()
-    d2 = District()
+    solution = Solution
     quantityOfDistricts = int
     quantityOfDistricts = 0
-    districtMatrix = []
 
     choosenBU = []  # Basic Units that are already choosen for the solution
     remainingBasicUnits = []  # Basic Units available to be assigned to a District
 
     def __init__(self, pro, quantityOfDistricts_):
         self.pvr = pro
-        # If quantityOfDistricts_ > quantityOfBasicUnits then throw exception
-        if(quantityOfDistricts_ > len(self.pvr.basicUnits)):
+
+        if(quantityOfDistricts_ > len(self.pvr.basicUnits) or (quantityOfDistricts_ == 0)):
             # Excepción e interrumpir ejecución
-            print("Quantity of Districts is greater than Basic Units")
+            raise Exception(
+                "A solution could not be created. Please check that the quantity of Districts be lower than the quantity of Basic Units and greater than cero")
         else:
             self.quantityOfDistricts = quantityOfDistricts_
 
     def createEmptySolution(self):
         if (int(self.quantityOfDistricts) > 0):
             self.createRandomSolution()
-        else:
-            raise Exception(
-                "A solution could not be created. Please check that the quantity of Districts be lower than the quantity of Basic Units")
+        # else:
+        #     raise Exception(
+        #         "A solution could not be created. Please check that the quantity of Districts be lower than the quantity of Basic Units and greater than cero")
 
     def createRandomSolution(self):
-        for b in self.pvr.basicUnits:
-            self.remainingBasicUnits.append(b)
+        if (int(self.quantityOfDistricts) > 0):
+            for b in self.pvr.basicUnits:
+                self.remainingBasicUnits.append(b)
 
-        averageWorkLoad = (self.pvr.WL) / \
-            self.quantityOfDistricts  # Get WorkLoad Average
+            averageWorkLoad = (self.pvr.WL) / \
+                self.quantityOfDistricts  # Get WorkLoad Average
 
-        print("Total WorkLoad: ", self.pvr.WL)
-        print("averageWorkLoad: ", averageWorkLoad)
-        next_ = True
+            print("Total WorkLoad: ", self.pvr.WL)
+            print("averageWorkLoad: ", averageWorkLoad)
 
-        # Assign one BU to each District:
-        for n in range(self.quantityOfDistricts):
-            # create the quantity of Districts required
-            # Assign BU to each District
-            district = District()  # Empty District
-            selectedBU = self.remainingBasicUnits.pop(
-                random.randrange(len(self.remainingBasicUnits)))
-            district.addBasicUnits(selectedBU)
-            self.choosenBU.append(selectedBU)
-            # Insert District in matrix solution
-            self.districtMatrix.append(district)
+            # Assign one BU to each District:
+            for n in range(self.quantityOfDistricts):
+                # create the quantity of Districts required
+                # Assign BU to each District
+                district = District()  # Empty District
+                selectedBU = self.remainingBasicUnits.pop(
+                    random.randrange(len(self.remainingBasicUnits)))
+                district.addBasicUnits(selectedBU)
+                self.choosenBU.append(selectedBU)
+                # Insert District in matrix solution
+                self.solution.districtMatrix.append(district)
 
-        for newDistrict in self.districtMatrix:
+            for newDistrict in self.solution.districtMatrix:
 
-            if(len(self.choosenBU) < len(self.pvr.basicUnits)):
-                selectedBU = newDistrict.getLastBU()
+                if(len(self.choosenBU) < len(self.pvr.basicUnits)):
+                    selectedBU = newDistrict.getLastBU()
 
-                print("BU Seleccionada: ", selectedBU.getId())
+                    print("BU Seleccionada: ", selectedBU.getId())
 
-                self.printListId(self.choosenBU, "choosenBU")
+                    self.printListId(self.choosenBU, "choosenBU")
 
-                # While District wl is lower than average
-                goon = True
-                randomBU = 0
-                while(goon):
-                    # There is still BU to be assigned?
-                    if(len(self.choosenBU) >= len(self.pvr.basicUnits)):
-                        goon = False
-                    else:
-                        # Workload limit (of current District) has been gotten?
-                        if (newDistrict.workLoadBalance() >= averageWorkLoad):
+                    # While District wl is lower than average
+                    goon = True
+                    randomBU = 0
+                    while(goon):
+                        # There is still BU to be assigned?
+                        if(len(self.choosenBU) >= len(self.pvr.basicUnits)):
                             goon = False
                         else:
-                            # Add adyacent BU to the same district
-                            # self.adjacencies  Determinar una de las BU adyacentes ala última y seleccionarla.
-
-                            # Validar si todavía hay BU disponibles:
-                            randomBU = self.randomBUAdjacent(
-                                selectedBU, newDistrict)
-
-                            if (randomBU != False):
-                                print("Received: ", randomBU.id)
-                                newDistrict.addBasicUnits(
-                                    randomBU)
-                                self.choosenBU.append(randomBU)
-                                self.printListId(
-                                    self.remainingBasicUnits, "Before: self.remainingBasicUnits: ")
-
-                                print("BU to Remove:", randomBU.id)
-
-                                self.remainingBasicUnits.remove(randomBU)
-
-                                self.printListId(
-                                    self.remainingBasicUnits, "After: self.remainingBasicUnits: ")
+                            # Workload limit (of current District) has been gotten?
+                            if (newDistrict.workLoadBalance() >= averageWorkLoad):
+                                goon = False
                             else:
-                                goon = False  # There is no adjacent BU available
+                                # Add adyacent BU to the same district
+                                # self.adjacencies  Determinar una de las BU adyacentes ala última y seleccionarla.
 
-                # Insert District in matrix solution
-                print("Districts in Solution: ", len(self.districtMatrix))
-                print("Random District: ", newDistrict.printQuantity())
-            else:
-                next_ = False
+                                # Validar si todavía hay BU disponibles:
+                                randomBU = self.randomBUAdjacent(
+                                    selectedBU, newDistrict)
 
-        ##########################################
-        # Assign remaining BU into Districts randomly
-        remain = True
-        while (remain):
-            print("cantidad de BU faltantes: ", len(self.remainingBasicUnits))
-            for d in self.districtMatrix:
-                if(len(self.remainingBasicUnits) > 0):
-                    d.addBasicUnits(self.remainingBasicUnits.pop())
+                                if (randomBU != False):
+                                    print("Received: ", randomBU.id)
+                                    newDistrict.addBasicUnits(
+                                        randomBU)
+                                    self.choosenBU.append(randomBU)
+                                    self.printListId(
+                                        self.remainingBasicUnits, "Before: self.remainingBasicUnits: ")
+
+                                    print("BU to Remove:", randomBU.id)
+
+                                    self.remainingBasicUnits.remove(randomBU)
+
+                                    self.printListId(
+                                        self.remainingBasicUnits, "After: self.remainingBasicUnits: ")
+                                else:
+                                    goon = False  # There is no adjacent BU available
+
+                    # Insert District in matrix solution
+                    print("Districts in Solution: ", len(
+                        self.solution.districtMatrix))
+                    print("Random District: ", newDistrict.printQuantity())
                 else:
-                    remain = False
+                    next_ = False
+
+            ##########################################
+            # Assign remaining BU into Districts randomly
+            remain = True
+            while (remain):
+                print("cantidad de BU faltantes: ",
+                      len(self.remainingBasicUnits))
+                for d in self.solution.districtMatrix:
+                    if(len(self.remainingBasicUnits) > 0):
+                        d.addBasicUnits(self.remainingBasicUnits.pop())
+                    else:
+                        remain = False
+        return self.solution
 
     def randomBUAdjacent(self, rBU, newDistrict):
         # Generates a new random number not choosen before and adjacent to a BU
@@ -564,11 +570,11 @@ class Solution:
         print("Quantity of Basic Units:_", len(self.pvr.basicUnits))
 
         i = 0
-        for d in self.districtMatrix:
+        for d in self.solution.districtMatrix:
             i += 1
             print("District %d: " % i, d.printQuantity())
         i = 0
-        for d in self.districtMatrix:
+        for d in self.solution.districtMatrix:
             i += 1
             print("District %d: " % i, d.printDistrict())
 

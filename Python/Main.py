@@ -4,6 +4,7 @@ Created on Wed Sep 29 09:26:33 2021
 
 @author: Juan G Villegas
 """
+import imp
 from Entities import SynConPVRP  # Name of the class for the problem
 from Entities import CompatibilityIndex
 from Entities import Distance
@@ -12,6 +13,8 @@ from Entities import BasicUnit
 from Entities import Adjacency
 from Entities import District
 from Entities import Solution
+from Entities import RandomSolver
+from Test import Test
 
 if __name__ == "__main__":
     print("Execution on ")
@@ -22,9 +25,11 @@ if __name__ == "__main__":
     # print(instance.distances)
 
     # print(instance.adjacencies)
+    requiredDistricts = 7
+    randomSolver = RandomSolver(instance, requiredDistricts)
+    solution_ = randomSolver.createRandomSolution()
 
-    solution = Solution(instance, 7)
-    solution.createEmptySolution()
+    test = Test(solution_, instance, requiredDistricts)
+    test.checkSolution()
 
-    # solution.createSolution()
-    solution.printInfoSolution()
+    randomSolver.printInfoSolution()
