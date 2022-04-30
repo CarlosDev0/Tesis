@@ -22,6 +22,7 @@ import re
 import numpy as np  # numpy for the calculation of the distances
 from scipy.spatial import distance
 import random
+import itertools
 
 
 class SynConPVRP:
@@ -98,11 +99,16 @@ class SynConPVRP:
                 t = Adjacency(i, j, a[j])
                 self.adjacencies.append(t)
 
-        # print(self.adjacencies)
-        # print(district)
+    def distance(self, pair):
+        # Distance: distance between a par of BU of the district
+        row_ = pair[0]
+        col_ = pair[1]
+        result = 0
+        for a in self.distances:
+            if (np.logical_and(a.row == row_, a.col == col_)):
+                result = a.dist
+        return result
 
-        #solution = Solution()
-        # solution.printInfoSolution()
     def findAdjacent(self, basicUnit):
         return ""
     #     for i in range(self.numDays):
@@ -213,6 +219,12 @@ class District():
             self.setBasicUnits.remove(BasicUnit)
             self.quantity_BU -= 1
 
+    def getListBUIndex(self):
+        listBU = []
+        for item in self.setBasicUnits:
+            listBU.append(item.id)
+        return listBU
+
     def printQuantity(self):
         return "Quantity of BU in district: % s " % (len(self.setBasicUnits))
         #print("Quantity of BU in district: ", len(self.setBasicUnits))
@@ -224,6 +236,17 @@ class District():
             wl += int(bu.wl)
         return wl
 
+    def pairsBU(self):
+        # compactness measure i.e. the maximum distance between
+        # two basic units assigned to the same district as follows:
+        listBU = self.getListBUIndex()
+        #print("listBU", listBU)
+        pairs = self.all_pairs(listBU)
+        return pairs
+
+    def noAdjacency(self):
+        print("")
+
     def getLastBU(self):
         return self.setBasicUnits[-1]
 
@@ -232,6 +255,10 @@ class District():
         for bu in self.setBasicUnits:
             buIndex.append(bu.id)
         return buIndex
+
+    def all_pairs(self, lst):
+        # Get all pair of a list
+        return list(itertools.combinations(lst, 2))
 
     def __repr__(self):
         return str(self.__class__) + ": " + str(self.__dict__)

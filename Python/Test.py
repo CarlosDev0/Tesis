@@ -44,6 +44,8 @@ class Test:
         else:
             print("Test of Average Work Load Districts in solution: FAILED")
 
+        self.validateMaxCompactness(self.solution.districtMatrix)
+
     def validateSameSet(self, originalBUSet_, assignedBUSet_):
         # Validate that every BU is assigned in the solution
         answer = False
@@ -106,3 +108,19 @@ class Test:
             answer = False
 
         return answer
+
+    def validateMaxCompactness(self, districtMatrix):
+        i = 0
+        maxDistance = []
+        for di in districtMatrix:
+            distances = []
+            pairs = di.pairsBU()
+            for x in pairs:
+                # print(x)
+                distances.append(self.instance.distance(x))
+                # print(self.instance.distance(x))
+            if(len(distances) > 0):
+                maxDistance.append(max(distances))
+                print("Compactness ", i, " ", max(distances))
+            i += 1
+        print("maxCompactness ", i, " ", max(maxDistance))
