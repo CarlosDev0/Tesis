@@ -51,6 +51,13 @@ class Test:
         else:
             print("Test of Max Compactness in solution: FAILED")
 
+        adjacencyValidationAnswer = self.validateAdjacency(
+            self.instance, self.solution.districtMatrix)
+        if(adjacencyValidationAnswer == True):
+            print("Test of Adjacency in solution: O.K")
+        else:
+            print("Test of Adjacency in solution: FAILED")
+
     def validateSameSet(self, originalBUSet_, assignedBUSet_):
         # Validate that every BU is assigned in the solution
         answer = False
@@ -136,4 +143,20 @@ class Test:
             answer = False
             print("Max Compactness expected was %s, but gotten %s" %
                   (distMax, maxDitance))
+        return answer
+
+    def validateAdjacency(self, inst, matrixDistrict_):
+        answer = True
+        # Choose every BU and Check that be adjacent to at least one BU in each District (checking the adjacency vector of each district):
+        # If not then there is a problem of adjacenty in such District
+        districtNumber = 0
+        for dis in matrixDistrict_:
+            districtNumber = districtNumber+1
+            if(len(dis.setBasicUnits) > 1):
+                adjList = inst.getAdjacencybyDistrict(dis)
+                for bu in dis.setBasicUnits:
+                    if (float(bu.id) not in adjList):
+                        answer = False
+                        print("%s Basic Unit is not in adjacency of District %s" %
+                              (bu.id, districtNumber,))
         return answer

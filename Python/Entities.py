@@ -111,6 +111,33 @@ class SynConPVRP:
 
     def findAdjacent(self, basicUnit):
         return ""
+
+    def getAdjacencybyId(self, row_):
+        # Returns the list of id adjacent to ONE BU received
+        results = np.array([])
+        for a in self.adjacencies:
+            if (np.logical_and(a.row == row_, int(a.adjac) == 1)):
+                results = np.append(results, a.col,  axis=None)
+        return results
+
+    def getAdjacencybyDistrict(self, district):
+        # Returns the list of id adjacent to each BU of the District received
+
+        results = np.array([])
+        for d in district.setBasicUnits:
+            row_ = d.id
+            #print("row_: ", row_)
+            listGotten = self.getAdjacencybyId(row_)
+            listGotten = listGotten.astype(int)
+            #print("listGotten: ", listGotten)
+            for lg in listGotten:
+                #print("itemGotten: ", int(lg))
+                results = np.append(results, int(lg),  axis=None)
+
+        results = list(dict.fromkeys(results))  # remove duplicates
+        #print("results_Adjacenty_District: ", results)
+        return results
+
     #     for i in range(self.numDays):
     #         a = f_entrada.readline()
     #         a = re.split("\t", a)
@@ -482,6 +509,8 @@ class RandomSolver:
                         d.addBasicUnits(self.remainingBasicUnits.pop())
                     else:
                         remain = False
+
+        self.printInfoSolution()
         return self.solution
 
     def randomBUAdjacent(self, rBU, newDistrict):
@@ -533,7 +562,6 @@ class RandomSolver:
             if (np.logical_and(a.row == row_, int(a.adjac) == 1)):
 
                 results = np.append(results, a.col,  axis=None)
-
         return results
 
     def getAdjacencybyDistrict(self, district):

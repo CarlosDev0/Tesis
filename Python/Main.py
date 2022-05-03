@@ -24,12 +24,9 @@ if __name__ == "__main__":
     instance.read_data()
     # print(instance.distances)
 
-    # print(instance.adjacencies)
-    requiredDistricts = 7
+    requiredDistricts = 15
     randomSolver = RandomSolver(instance, requiredDistricts)
     solution_ = randomSolver.createRandomSolution()
 
     test = Test(solution_, instance, requiredDistricts)
     test.checkSolution()
-
-    randomSolver.printInfoSolution()
