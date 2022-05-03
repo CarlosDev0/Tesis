@@ -54,7 +54,7 @@ class SynConPVRP:
         self.numDist = aux       # N Number of districts
         aux = int(b[1])
         self.numBasicUnits = aux       # M Number of basic Units
-        aux = int(b[2])
+        aux = float(b[2])
         self.maxDistance = aux     # Maximum distance allowed
         aux = float(b[3])
         self.DeviationPermited = aux  # Maximum deviation permited
@@ -106,7 +106,7 @@ class SynConPVRP:
         result = 0
         for a in self.distances:
             if (np.logical_and(a.row == row_, a.col == col_)):
-                result = a.dist
+                result = float(a.dist)
         return result
 
     def findAdjacent(self, basicUnit):

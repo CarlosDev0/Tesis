@@ -44,7 +44,12 @@ class Test:
         else:
             print("Test of Average Work Load Districts in solution: FAILED")
 
-        self.validateMaxCompactness(self.solution.districtMatrix)
+        maxCompactnessAnswer = self.validateMaxCompactness(
+            self.solution.districtMatrix, self.instance.maxDistance)
+        if(maxCompactnessAnswer == True):
+            print("Test of Max Compactness in solution: O.K")
+        else:
+            print("Test of Max Compactness in solution: FAILED")
 
     def validateSameSet(self, originalBUSet_, assignedBUSet_):
         # Validate that every BU is assigned in the solution
@@ -89,6 +94,7 @@ class Test:
         return answer
 
     def validateAverageWorkLoadDistricts(self, districtMatrix):
+        # Validate that each district has a workload below average
         answer = True
         notInAverage = []
         if (len(districtMatrix) > 0):
@@ -102,16 +108,18 @@ class Test:
                         notInAverage.append(obj.id)
                     if (len(notInAverage) > 0):
                         print(
-                            "There is a problem, these District has a workload up than average.", notInAverage)
+                            "There is a problem, these District has a workload upper than average.", notInAverage)
                     notInAverage = []
         else:
             answer = False
 
         return answer
 
-    def validateMaxCompactness(self, districtMatrix):
+    def validateMaxCompactness(self, districtMatrix, distMax):
+        # Validate that max distance between BU is lower than the read parameter
         i = 0
-        maxDistance = []
+        answer = True
+        listMaxDistance = []
         for di in districtMatrix:
             distances = []
             pairs = di.pairsBU()
@@ -120,7 +128,12 @@ class Test:
                 distances.append(self.instance.distance(x))
                 # print(self.instance.distance(x))
             if(len(distances) > 0):
-                maxDistance.append(max(distances))
-                print("Compactness ", i, " ", max(distances))
+                listMaxDistance.append(max(distances))
+                #print("Compactness ", i, " ", max(distances))
             i += 1
-        print("maxCompactness ", i, " ", max(maxDistance))
+        maxDitance = max(listMaxDistance)
+        if(maxDitance > float(distMax)):
+            answer = False
+            print("Max Compactness expected was %s, but gotten %s" %
+                  (distMax, maxDitance))
+        return answer
