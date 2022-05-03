@@ -13,8 +13,10 @@ from Entities import BasicUnit
 from Entities import Adjacency
 from Entities import District
 from Entities import Solution
-from Entities import RandomSolver
+#from Entities import RandomSolver
 from Test import Test
+from RandomSolver import RandomSolver
+from MshSolver import MshSolver
 
 if __name__ == "__main__":
     print("Execution on ")
@@ -30,3 +32,6 @@ if __name__ == "__main__":
 
     test = Test(solution_, instance, requiredDistricts)
     test.checkSolution()
+
+    #msh = MshSolver(instance, requiredDistricts)
+    # msh.createMSHSolution()
