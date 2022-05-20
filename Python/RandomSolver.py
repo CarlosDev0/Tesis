@@ -29,9 +29,6 @@ class RandomSolver:
     def createEmptySolution(self):
         if (int(self.quantityOfDistricts) > 0):
             self.createRandomSolution()
-        # else:
-        #     raise Exception(
-        #         "A solution could not be created. Please check that the quantity of Districts be lower than the quantity of Basic Units and greater than cero")
 
     def createRandomSolution(self):
         if (int(self.quantityOfDistricts) > 0):
@@ -52,6 +49,10 @@ class RandomSolver:
                 selectedBU = self.remainingBasicUnits.pop(
                     random.randrange(len(self.remainingBasicUnits)))
                 district.addBasicUnits(selectedBU)
+
+                # Update workload of District (wl) adding wl of new BU
+                district.updateWorkLoad("Add", selectedBU)
+                # district.setWorkLoad()  # Update workload of District (wl)
                 self.choosenBU.append(selectedBU)
                 # Insert District in matrix solution
                 self.solution.districtMatrix.append(district)
@@ -74,7 +75,7 @@ class RandomSolver:
                             goon = False
                         else:
                             # Workload limit (of current District) has been gotten?
-                            if (newDistrict.workLoadBalance() >= averageWorkLoad):
+                            if (newDistrict.wl >= averageWorkLoad):
                                 goon = False
                             else:
                                 # Add adyacent BU to the same district
@@ -88,6 +89,8 @@ class RandomSolver:
                                     print("Received: ", randomBU.id)
                                     newDistrict.addBasicUnits(
                                         randomBU)
+                                    # Update workload of District (wl)
+                                    newDistrict.updateWorkLoad("Add", randomBU)
                                     self.choosenBU.append(randomBU)
                                     self.printListId(
                                         self.remainingBasicUnits, "Before: self.remainingBasicUnits: ")
@@ -114,11 +117,30 @@ class RandomSolver:
             while (remain):
                 print("cantidad de BU faltantes: ",
                       len(self.remainingBasicUnits))
-                for d in self.solution.districtMatrix:
-                    if(len(self.remainingBasicUnits) > 0):
-                        d.addBasicUnits(self.remainingBasicUnits.pop())
-                    else:
-                        remain = False
+
+                if(len(self.remainingBasicUnits) > 0):
+                    # Validar adjacencia antes de asignarla a un distrito.
+                    adjacentList = []
+                    for d in self.solution.districtMatrix:  # Get adjacentList of each district
+                        adjacentList.append(self.pvr.getAdjacencybyDistrict(d))
+
+                    #print("remainingBasicUnits", self.remainingBasicUnits)
+
+                    bu = self.remainingBasicUnits.pop()
+
+                    i = 0
+                    for d in self.solution.districtMatrix:
+                        if hasattr(bu, 'id'):
+                            if(bu.id in adjacentList[i]):
+                                # print("adjacentList %s , list: %s" %
+                                #      (i, adjacentList[i]))
+                                d.addBasicUnits(bu)
+                                d.updateWorkLoad("Add", bu)
+                                bu = ""
+                                # break
+                        i += 1
+                else:
+                    remain = False
 
         self.printInfoSolution()
         return self.solution
@@ -135,7 +157,6 @@ class RandomSolver:
         adjacentList = []  # list of indexes of adjacent BU
         print("Received BU: ", rBU.id)
 
-        # adjacentList = self.getAdjacencybyId(rBU.id)  #Function to get adjacency list by BU id
         # Function to get adjacency list by District
         adjacentList = self.getAdjacencybyDistrict(newDistrict)
 
@@ -146,15 +167,14 @@ class RandomSolver:
 
             intersect = []
             for bu in adjacentList:
-                #intersect += [x for x in self.remainingBasicUnits if x.id == bu]
-                # intersect = np.append(
-                #    intersect, [x for x in self.remainingBasicUnits if x.id == bu], axis=None)
-                #interm = []
+
                 interm = (x for x in self.remainingBasicUnits if x.id == bu)
                 for ob in interm:
                     intersect.append(ob)
                     #intersect.append(intersect, ob, axis=None)
 
+            if ("[[]]" in intersect):
+                intersect.remove("[[]]")
             self.printListId(intersect, "intersect:_9: ")
             intersect = [ele for ele in intersect if ele != []]
             self.printListId(intersect, "Intersect wihtout []_10: ")
@@ -180,16 +200,16 @@ class RandomSolver:
         results = np.array([])
         for d in district.setBasicUnits:
             row_ = d.id
-            print("row_: ", row_)
+            #print("row_: ", row_)
             listGotten = self.getAdjacencybyId(row_)
             listGotten = listGotten.astype(int)
-            print("listGotten: ", listGotten)
+            #print("listGotten: ", listGotten)
             for lg in listGotten:
-                print("itemGotten: ", int(lg))
+                #print("itemGotten: ", int(lg))
                 results = np.append(results, int(lg),  axis=None)
 
         results = list(dict.fromkeys(results))  # remove duplicates
-        print("results_Adjacenty_District: ", results)
+        #print("results_Adjacenty_District: ", results)
         return results
 
     def printListId(self, listReceived, textToPrint):
@@ -197,42 +217,10 @@ class RandomSolver:
         ichosen.append([x.id for x in listReceived])
         print(textToPrint, ichosen)
 
-    # def createSolution(self):
-    #     b = 0
-
-    #     self.q = int(len(self.pvr.basicUnits))
-
-    #     for bu in self.pvr.basicUnits:
-    #         b += 1
-    #         if b <= self.q/2:
-    #             self.d1.addBasicUnits(bu)
-    #         else:
-    #             self.d2.addBasicUnits(bu)
-
-    #     print("District 1: ", self.d1.printQuantity())
-    #     print("District 2: ", self.d2.printQuantity())
-
-    #     # Calculate workBalance:
-    #     print("WorkLoad of District: ", self.d1.workLoadBalance())
-    #     print("WorkLoad of District: ", self.d2.workLoadBalance())
-
-    # def createEmptySolution():
-    # def createRandomSolution():
-    # Que reciba como argumento el número de distritos a considerar (k). Si k> Unidades básicas entonces lanzar excepción
-    # Crear distrito vacío.
-    # Agregar BU aleatoria
-    # Agregar BU Adyacente
-    # Agregar unidades básicas hasta que se pase de la carga de trabajo promedio
-    # Agregar distrito a Solución
-    # Repetir el proceso.
-
-    # Calcular Compacidad:
-    # The second formulation consists of minimizing a compactness measure which is the maximum distance between two basic units assigned to the same district.
-    # La máxima es la compacidad de la solución
-
     def printInfoSolution(self):
         print("Solution Summary: ")
         print("Quantity of Basic Units:_", len(self.pvr.basicUnits))
+        print("Quantity of Districts:_", len(self.solution.districtMatrix))
 
         i = 0
         for d in self.solution.districtMatrix:

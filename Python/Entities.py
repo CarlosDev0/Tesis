@@ -69,9 +69,9 @@ class SynConPVRP:
             a = f_entrada.readline()
             a = re.split("\t", a)
             ps = BasicUnit(int(a[0]), float(a[1]), float(
-                a[2]), int(a[3]))  # id, la, lo, wl
+                a[2]), float(a[3]))  # id, la, lo, wl
             self.basicUnits.append(ps)
-            self.WL += int(a[3])
+            self.WL += float(a[3])
             # district.addBasicUnits(ps)
         # Compatibility Index section
         for i in range(self.numBasicUnits):
@@ -109,7 +109,8 @@ class SynConPVRP:
                 result = float(a.dist)
         return result
 
-    def findAdjacent(self, basicUnit):
+    def getAdjacencyList(self, row):
+
         return ""
 
     def getAdjacencybyId(self, row_):
@@ -215,10 +216,14 @@ class BasicUnit:
 
 class District():
     quantity_BU = int
+    wl = float  # District work load
+    distance = float  # Distance of all BU of the District
 
     def __init__(self):
         self.setBasicUnits = []
         self.quantity_BU = 0
+        self.wl = float(0)
+        self.distance = float(0)
         # Carga de Trabajo   #Actualizar cuando se agrega o elimina una UB
         # Distancia máxima entre Unidades básicas (compacidad)  #Actualizar cuando se agrega o elimina una UB
         pass
@@ -254,16 +259,25 @@ class District():
 
     def printQuantity(self):
         return "Quantity of BU in district: % s " % (len(self.setBasicUnits))
-        #print("Quantity of BU in district: ", len(self.setBasicUnits))
 
     def workLoadBalance(self):
-        wl = int
+        wl = float
         wl = 0
         for bu in self.setBasicUnits:
-            wl += int(bu.wl)
+            wl += float(bu.wl)
         return wl
 
+    def setWorkLoad(self):
+        self.wl = self.workLoadBalance()
+
+    def updateWorkLoad(self, operant, bu):
+        if(operant == "Add"):
+            self.wl = float(self.wl) + float(bu.wl)
+        else:
+            self.wl = float(self.wl) - float(bu.wl)
+
     def pairsBU(self):
+        # Returns the pairs of BU of the district (all combinations of pairs).
         # compactness measure i.e. the maximum distance between
         # two basic units assigned to the same district as follows:
         listBU = self.getListBUIndex()
@@ -271,8 +285,43 @@ class District():
         pairs = self.all_pairs(listBU)
         return pairs
 
-    def noAdjacency(self):
-        print("")
+    def maxDistancesDistrict(self, instance):
+        # Radio del distrito = Máxima distancia en un distrito
+        distances = []
+        pairs = self.pairsBU()
+        maxDistance = 0
+        for x in pairs:
+            # print(x)
+            distances.append(instance.distance(x))
+            # print(self.instance.distance(x))
+        if(len(distances) > 0):
+            maxDistance = max(distances)
+            #print("Compactness ", i, " ", max(distances))
+
+        return maxDistance
+
+    def pairsBU_Ordered(self):
+        # Returns the pairs of BU of the district in cardinally order.
+        # two basic units assigned to the same district as follows:
+        listBU = self.getListBUIndex()
+        list_Combination = list()
+        for i in range(len(listBU)):
+            if(i < (len(listBU)-1)):
+                list_Combination += list([listBU[i:i+2]])
+
+        #print("list_Combination", list_Combination)
+        return list_Combination
+
+    def sumDistancesDistrict(self, instance):
+        distances = []
+        sumDitance = 0
+        if (len(self.setBasicUnits) > 1):
+            pairs = self.pairsBU_Ordered()
+
+            for x in pairs:
+                #print("xxxx: ", x)
+                sumDitance += instance.distance(x)
+        return sumDitance
 
     def getLastBU(self):
         return self.setBasicUnits[-1]
@@ -395,6 +444,10 @@ class Adjacency:
 class Solution:
     districtMatrix = []
 
+    def averageWorkLoad(self):
+        quantityOfDistricts = len(self.districtMatrix)
+        avWorkLoad = self.WL/quantityOfDistricts  # Get WorkLoad Average
+        return avWorkLoad
 
 # class Customer:
 #     """

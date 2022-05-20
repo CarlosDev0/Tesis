@@ -7,6 +7,8 @@ Created on Fri April 29 09:40:22 2021
 
 from Entities import Solution
 from Entities import SynConPVRP
+from Entities import BasicUnit
+from Entities import District
 
 
 class Test:
@@ -21,12 +23,14 @@ class Test:
 
     def checkSolution(self):
         print("Test Results: ")
-        # assignedBUSet.append(20)   #To validate test
+        # self.instance.basicUnits.append(
+        #    BasicUnit(17, 5, 5, 5))  # To validate test
         sameSetAnswer = self.validateSameSet(
             self.instance.basicUnits, self.solution.districtMatrix)
         if (sameSetAnswer == True):
             print("Test of solution set completed: O.K")
 
+        # self.solution.districtMatrix.append(District())
         quantityOfDistrictAnswer = self.validateQuantityOfDistricts(
             self.solution.districtMatrix, self.requiredDistricts)
         if (quantityOfDistrictAnswer == True):
@@ -78,7 +82,7 @@ class Test:
             answer = True
         else:
             print(
-                "There is a problem, the solution set does not contains all the BU. ", originalBUSet, assignedBUSet)
+                "There is a problem, the solution set does not contains all the BU. Original set is: %s, assigned Set is: %s" % (originalBUSet, assignedBUSet))
         return answer
 
     def validateQuantityOfDistricts(self, districtMatrix, requiredDistricts):
@@ -88,7 +92,7 @@ class Test:
             answer = True
         else:
             print(
-                "There is a problem, the solution has a different quantity of Districts. Required number is: ", requiredDistricts)
+                "There is a problem, the solution has a different quantity of Districts. Required number is: %s, Districts in the solution: %s" % (requiredDistricts, len(districtMatrix)))
         return answer
 
     def validateEmptyDistricts(self, districtMatrix):
@@ -109,13 +113,13 @@ class Test:
                 len(districtMatrix)  # Get WorkLoad Average
 
             for item in districtMatrix:
-                if (item.workLoadBalance() > averageWorkLoad):
+                if (item.wl > averageWorkLoad):
                     answer = False
                     for obj in item.setBasicUnits:
                         notInAverage.append(obj.id)
                     if (len(notInAverage) > 0):
                         print(
-                            "There is a problem, these District has a workload upper than average.", notInAverage)
+                            "There is a problem, these District has a workload (%s) upper than average(%s)." % (round(item.wl, 2), round(averageWorkLoad, 2)), notInAverage)
                     notInAverage = []
         else:
             answer = False
