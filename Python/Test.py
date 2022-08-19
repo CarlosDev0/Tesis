@@ -83,6 +83,8 @@ class Test:
         else:
             print(
                 "There is a problem, the solution set does not contains all the BU. Original set is: %s, assigned Set is: %s" % (originalBUSet, assignedBUSet))
+            raise Exception(
+                "There is a problem, the solution set does not contains all the BU.")
         return answer
 
     def validateQuantityOfDistricts(self, districtMatrix, requiredDistricts):
@@ -93,6 +95,8 @@ class Test:
         else:
             print(
                 "There is a problem, the solution has a different quantity of Districts. Required number is: %s, Districts in the solution: %s" % (requiredDistricts, len(districtMatrix)))
+            raise Exception(
+                "There is a problem, the solution has a different quantity of Districts than requested.")
         return answer
 
     def validateEmptyDistricts(self, districtMatrix):
@@ -101,6 +105,8 @@ class Test:
             if (len(item.setBasicUnits) == 0):
                 answer = False
                 print(
+                    "There is a problem, the solution has an empty District.")
+                raise Exception(
                     "There is a problem, the solution has an empty District.")
         return answer
 
@@ -163,4 +169,6 @@ class Test:
                         answer = False
                         print("%s Basic Unit is not in adjacency of District %s" %
                               (bu.id, districtNumber,))
+                        raise Exception(
+                            "A Basic Unit is not adjacenty to the other in a District")
         return answer

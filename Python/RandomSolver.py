@@ -46,10 +46,17 @@ class RandomSolver:
                 # create the quantity of Districts required
                 # Assign BU to each District
                 district = District()  # Empty District
+
+                np.random.seed(10)  # Seed fixed for testing
+
                 selectedBU = self.remainingBasicUnits.pop(
                     random.randrange(len(self.remainingBasicUnits)))
                 district.addBasicUnits(selectedBU)
 
+                # /////////////// INCREMENTAL SOLUTION FOR DISTANCE//////////////
+                district.updateMaxDistance(
+                    self.pvr, selectedBU)
+                print("district.distance", district.distance)
                 # Update workload of District (wl) adding wl of new BU
                 district.updateWorkLoad("Add", selectedBU)
                 # district.setWorkLoad()  # Update workload of District (wl)
@@ -124,7 +131,7 @@ class RandomSolver:
                     for d in self.solution.districtMatrix:  # Get adjacentList of each district
                         adjacentList.append(self.pvr.getAdjacencybyDistrict(d))
 
-                    #print("remainingBasicUnits", self.remainingBasicUnits)
+                    print("remainingBasicUnits", self.remainingBasicUnits)
 
                     bu = self.remainingBasicUnits.pop()
 
@@ -132,8 +139,8 @@ class RandomSolver:
                     for d in self.solution.districtMatrix:
                         if hasattr(bu, 'id'):
                             if(bu.id in adjacentList[i]):
-                                # print("adjacentList %s , list: %s" %
-                                #      (i, adjacentList[i]))
+                                print("adjacentList %s , list: %s" %
+                                      (i, adjacentList[i]))
                                 d.addBasicUnits(bu)
                                 d.updateWorkLoad("Add", bu)
                                 bu = ""
@@ -181,6 +188,9 @@ class RandomSolver:
 
             if (len(intersect) > 0):
                 if (intersect != [[]]):
+
+                    np.random.seed(10)  # Seed fixed for testing
+
                     randomBU = np.random.choice(intersect)
 
         return randomBU
@@ -200,7 +210,7 @@ class RandomSolver:
         results = np.array([])
         for d in district.setBasicUnits:
             row_ = d.id
-            #print("row_: ", row_)
+            print("row_: ", row_)
             listGotten = self.getAdjacencybyId(row_)
             listGotten = listGotten.astype(int)
             #print("listGotten: ", listGotten)
@@ -223,10 +233,13 @@ class RandomSolver:
         print("Quantity of Districts:_", len(self.solution.districtMatrix))
 
         i = 0
+        totalDistance = 0
         for d in self.solution.districtMatrix:
             i += 1
+            totalDistance += d.distance
             print("District %d: " % i, d.printQuantity())
         i = 0
         for d in self.solution.districtMatrix:
             i += 1
             print("District %d: " % i, d.printDistrict())
+        print("Total Distance with Random solution: ", totalDistance)

@@ -52,6 +52,7 @@ class SynConPVRP:
         b = a.split()
         aux = int(b[0])  # Auxiliary variable for data reading
         self.numDist = aux       # N Number of districts
+        self.quantityOfDistricts = aux
         aux = int(b[1])
         self.numBasicUnits = aux       # M Number of basic Units
         aux = float(b[2])
@@ -81,16 +82,32 @@ class SynConPVRP:
                 t = CompatibilityIndex(i, j, a[j])
                 self.compatibility.append(t)
 
-        print(self.compatibility)
+        # print(self.compatibility)
         # Distance section
+        n = self.numBasicUnits
+        m = self.numBasicUnits
+        dm = [0] * n
+        for i in range(n):
+            dm[i] = [0] * m
+
+        aux = []
         for i in range(self.numBasicUnits):
             a = f_entrada.readline()
-            a = re.split("\t", a)
+            b = re.split("\t", a)
+            row = []
+            # /////// SOL 2 /////////////
+            # for j in range(self.numBasicUnits):
+            #    t = Distance(i, j, a[j])
+            # self.distances.append(t)
+            # /////// SOL 3 /////////////
             for j in range(self.numBasicUnits):
-                t = Distance(i, j, a[j])
-                self.distances.append(t)
+                row.append(b[j])
+            aux.append(row)
+        self.distances = aux
 
-        print(self.distances)
+        print("self.distances.shape", len(self.distances))
+
+        # print(self.distances)
         # adjacency index section
         for i in range(self.numBasicUnits):
             a = f_entrada.readline()
@@ -101,12 +118,21 @@ class SynConPVRP:
 
     def distance(self, pair):
         # Distance: distance between a par of BU of the district
-        row_ = pair[0]
-        col_ = pair[1]
         result = 0
-        for a in self.distances:
-            if (np.logical_and(a.row == row_, a.col == col_)):
-                result = float(a.dist)
+        # Version 2
+        # result = float([x.dist for x in self.distances if x.row ==
+        #               pair[0] and x.col == pair[1]][0])
+        # version 3
+        result = float(self.distances[pair[0]][pair[1]])
+        # result = float(self.distances[pair[0]][pair[1]])
+        # if (result == 0):
+        #     p0 = pair[0]
+        #     p1 = pair[1]
+        #     print("distancia: 0: %s _ %s" % (p0, p1))
+        #     raise Exception("Excepción")
+
+        #print("result", result)
+        #result = float(res[0])
         return result
 
     def getAdjacencyList(self, row):
@@ -116,9 +142,18 @@ class SynConPVRP:
     def getAdjacencybyId(self, row_):
         # Returns the list of id adjacent to ONE BU received
         results = np.array([])
-        for a in self.adjacencies:
-            if (np.logical_and(a.row == row_, int(a.adjac) == 1)):
-                results = np.append(results, a.col,  axis=None)
+        m = []
+        #print("row:", row_)
+        res = [x for x in self.adjacencies if x.row == row_]
+
+        for ad in res:
+            m.append(ad.col)
+        #print("res", m)
+        results = np.array(m)
+        #res = [x for x in self.adjacencies if x.row == row_ and x.adjac == 1]
+        # for a in self.adjacencies:
+        #     if (np.logical_and(a.row == row_, int(a.adjac) == 1)):
+        #         results = np.append(results, a.col,  axis=None)
         return results
 
     def getAdjacencybyDistrict(self, district):
@@ -138,62 +173,6 @@ class SynConPVRP:
         results = list(dict.fromkeys(results))  # remove duplicates
         #print("results_Adjacenty_District: ", results)
         return results
-
-    #     for i in range(self.numDays):
-    #         a = f_entrada.readline()
-    #         a = re.split("\t", a)
-    #         aux = ""
-    #         # the name of the days are not of the same lenght so we have to join the name into a string before creating the day
-    #         aux = aux.join(a[0])
-    #         d = Day(aux, i, int(a[1]))
-    #         # TODO: the name of the days are not of the same lenght!!!
-    #         self.days.append(d)
-    #     # Scenario section
-    #     for i in range(self.numScen):
-    #         a = f_entrada.readline()
-    #         a = re.split("\t", a)
-    #         name = a[0]
-    #         num = int(a[1])
-    #         s = Scenario(name, num)  # Customer section
-    #         self.scenarios.append(s)
-    #   # Depot section
-    #     coords = []
-    #     a = f_entrada.readline()
-    #     a = re.split("\t", a)
-    #     d = Depot(float(a[1]), float(a[2]))
-    #     self.depot = d
-    #     coordsAux = []
-    #     coordsAux.append(float(a[1]))
-    #     coordsAux.append(float(a[2]))
-    #     # print(tuple(coordsAux))
-    #     coords.append(tuple(coordsAux))
-    #     # Customer section
-    #     for i in range(self.numCus):
-    #         a = f_entrada.readline()
-    #         a = re.split("\t", a)
-    #         name = a[0]
-    #         x = float(a[1])
-    #         y = float(a[2])
-    #         dem = int(a[3])
-    #         stPres = int(a[4])
-    #         stTruck = int(a[5])
-    #         freq = int(a[6])
-    #         numPaterns = int(a[7])
-    #         auxL = []
-    #         cu = Customer(name, i, x, y, dem, stPres, stTruck, freq)
-    #         for j in range(numPaterns):
-    #             auxL.append(int(a[7+j+1]))
-    #         cu.visitpaterns = auxL
-    #         self.customers.append(cu)
-    #         # Coordinates matrix
-    #         coordsAux = []
-    #         coordsAux.append(float(a[1]))
-    #         coordsAux.append(float(a[2]))
-    #         coords.append(tuple(coordsAux))
-    #     # Distance calculation
-    #     #self.distances=np.empty((self.numCus+1, self.numCus+1))
-    #     # print(coords)
-    #     self.distances = distance.cdist(coords, coords, 'euclidean')
 
 
 class BasicUnit:
@@ -285,6 +264,31 @@ class District():
         pairs = self.all_pairs(listBU)
         return pairs
 
+    def updatePairsBU(self, newBU):
+        # Returns the pairs of BU of newBU with the former BU of the district.
+        # compactness measure i.e. the maximum distance between
+        # two basic units assigned to the same district as follows:
+        result = False
+        unique_combinations = []
+        list_1 = []
+        list_1.append(newBU.id)
+        #print("newBU.id: ", newBU.id)
+
+        #list1_permutations = itertools.permutations(list_1, 2)
+
+        listBU = self.getListBUIndex()
+        if(len(listBU) > 0):
+            for var in itertools.product(list_1, listBU):
+                unique_combinations.append((var[0], var[1]))
+        # if(len(listBU) > 0):
+        #     for a in listBU:
+        #         if(newBU.id != a):  # avoid to repet the same BU
+        #             unique_combinations.append((newBU.id, a))
+
+            if(unique_combinations != []):
+                result = unique_combinations
+        return result
+
     def maxDistancesDistrict(self, instance):
         # Radio del distrito = Máxima distancia en un distrito
         distances = []
@@ -293,10 +297,10 @@ class District():
         for x in pairs:
             # print(x)
             distances.append(instance.distance(x))
-            # print(self.instance.distance(x))
+            #print("self.instance.distance(x)", instance.distance(x))
         if(len(distances) > 0):
             maxDistance = max(distances)
-            #print("Compactness ", i, " ", max(distances))
+            #print("Compactness ", maxDistance)
 
         return maxDistance
 
@@ -316,12 +320,60 @@ class District():
         distances = []
         sumDitance = 0
         if (len(self.setBasicUnits) > 1):
-            pairs = self.pairsBU_Ordered()
+            pairs = self.pairsBU()  # pairs = self.pairsBU_Ordered()
 
             for x in pairs:
                 #print("xxxx: ", x)
                 sumDitance += instance.distance(x)
         return sumDitance
+
+    def updateMaxDistance(self, instance, newBU):
+        # get the pares between the new BU and the current BU of the District
+        pairs = self.updatePairsBU(newBU)
+        if(pairs != False):
+            #print("self.pairs: ", pairs)
+            # pairs is False when there is less than 2 BU in the districts
+            distances = []
+            maxDistance = 0
+            for x in pairs:
+                # print(x)
+                distances.append(instance.distance(x))
+                # distances.append(5)
+                #print("self.instance.distance(x)1", self.distance)
+
+            if(len(distances) > 0):
+                maxDistance = max(distances)
+                #print("self.instance.distance(x)2", self.distance)
+
+            # if new max distance is greater than current distance then replace distance of district
+            if(self.distance < maxDistance):
+                self.distance = maxDistance
+                if(self.distance == 0):
+                    raise Exception("Excepción distance = 0 (Max)")
+                #print("maxDistance", maxDistance)
+        else:
+            self.distance = 0
+            listBU = self.getListBUIndex()
+            #print("distance=0: ", len(listBU), newBU)
+
+    def updateSumDistance(self, instance, newBU):
+        sumDistance = 0
+        # get the pares between the new BU and the current BU of the District
+        pairs = self.updatePairsBU(newBU)
+        if(pairs != False):
+            # pairs is False when there is less than 2 BU in the districts
+            #distances = []
+            for x in pairs:
+                # print(x)
+                # Get distance of ever pair:
+                sumDistance += instance.distance(x)
+                #print("self.instance.distance(x)", instance.distance(x))
+            # if(len(distances) > 0):
+            #     sumDistance = np.sum(distances)
+
+            # Add sumDistance (of new BU) to the current distance of district
+            self.distance += sumDistance
+            #print("sumDistance", sumDistance)
 
     def getLastBU(self):
         return self.setBasicUnits[-1]
@@ -448,197 +500,3 @@ class Solution:
         quantityOfDistricts = len(self.districtMatrix)
         avWorkLoad = self.WL/quantityOfDistricts  # Get WorkLoad Average
         return avWorkLoad
-
-# class Customer:
-#     """
-#    A class used that represent a customer
-
-#     Attributes:
-#         id (str): Name of the customer
-#         pos (int): position in the set of customers
-#         x (float): x coordinate of the customer/also can used as the latitude
-#         y (float): y coordinade of the cstomer /also can used as the longitude
-#         demand (int): demand to be served during the week / drop size of the customer
-#         stPres (int): service time of the preseller
-#         stTruck(int): service time of the truck
-#         freq (int): number of times that a customer need to be visited
-#         visitPaterns(list of int): feasible visit paterns for the customer
-
-#     """
-
-#     def __init__(self, id, ord, x=0, y=0, demand=0, stp=0, stt=0, freq=1):
-#         self.id = id
-#         self.pos = ord
-#         self.x = x
-#         self.y = y
-#         self.demand = demand
-#         self.stPres = stp
-#         self.stTruck = stt
-#         self.freq = freq
-#         self.visitpaterns = []
-
-
-# class Depot:
-#     """
-#     Attributes:
-#     x (float): x coordinate of the depot/also can used as the latitude
-#     y (float): y coordinade of the depot/also can used as the longitude
-#     """
-
-#     def __init__(self, x=0, y=0):
-#         self.x = x
-#         self.y = y
-
-
-# class Resource:
-#     """
-#     A super class to extend with the reources
-#     name (str): name of the preseller
-#     pos(int): number of the preseller used for indexing
-#     cap (int): capacity of the preseller
-#     """
-
-#     def __init__(self, name, pos, cap, cf, cv):
-#         self.name = name
-#         self.pos = pos
-#         self.cap = cap
-#         self.cf = cf
-#         self.cv = cv
-
-
-# class Preseller(Resource):
-#     """
-#     A class used that represent a preseller
-
-#     Attributes:
-#         name (str): name of the preseller
-#         pos(int): number of the preseller used for indexing
-#         cap (int): capacity of the preseller
-#         cfs (float): fixed cost of the preseller if used in a given period
-#         cs(float):per distance cost
-#     """
-
-#     def __init__(self, name, pos, cap, cfs, cs=1):
-#         self.name = name
-#         self.pos = pos
-#         self.cap = cap
-#         self.cf = cfs
-#         self.cv = cs
-
-
-# class Truck(Resource):
-#     """
-#     A class used that represent a depot
-
-#     Attributes:
-#         name (str): name of the preseller
-#         pos(int): number of the preseller used for indexing
-#         cap (int): capacity of the preseller
-#         cfs (float): fixed cost of the preseller if used in a given period
-#         cs(float):per nit distance cost
-#     """
-
-#     def __init__(self, name, pos, cap, cft, ct=1):
-#         self.name = name
-#         self.pos = pos
-#         self.cap = cap
-#         self.cf = cft
-#         self.cv = ct
-
-
-# class Day:
-#     """
-#     A class used that represent a day
-
-#     Attributes:
-#         name (str): name of the day
-#         pos(int): number of the day in the planning horizon
-#         dur (int): maximm dration of a route this day
-#     """
-
-#     def __init__(self, name, pos, dur):
-#         self.name = name
-#         self.pos = pos
-#         self.dur = dur
-
-
-# class Scenario:
-#     """
-#     A class to store the information of  a given scenario: visiting pattern for the days of the planning horizon
-#     Attributes:
-#         name (str): the name of the scenario
-#         num (int): an integer number that describes the scenario in binary code
-#         visit (binary): a binary number representing  the binary number that indicates the days that the scenario visits a customer
-
-#     """
-
-#     def __init__(self, name, num):
-#         self.name = name
-#         self.num = num
-#         self.visit = bin(num)
-
-
-# class myRoute:
-#     """
-#     A class used to represent a route
-
-#     Attributes:
-#         resource (A truck or a preseller): that performs the route
-#         day (Day): the day in which the route is performed
-#         name (str): name of the route  (mnemonic: created by concatenating the name of the reource that performs the route and the they it is performed )
-#         depot (depot): the depot from which the route departs and its the seed of the seqnece
-#         sequence (list of customers and the depot): a list of nodes in the sequence they are visited by the resource
-#         load (float): the load of the route (sum of the demand of the customers added to the route)
-#         distance (float): the distance travelled by the resuorce  in the sequence
-#         fixCost(float): cost of using te resource
-#         varCost (float): cost of travelling the route
-#         cost (float): the cost of the route calculated with the fixed resource cost and the distance cost
-
-
-#     Methods: TODO
-#         Constructor
-#         INSERT A CUSTOMER IN THE FIRST OR LAST POSITION  OF THE ROUTE
-#         INSERT A CUSTOMER IN A GIVEN POSITION  OF THE ROUTE
-#         INSERT A CUSTOMER IN A RANDOM POSITION  OF THE ROUTE
-#         REMOVE A SPECIFIC CUSTOMER
-#         REMOVE A CUSTOMER IN A GIVEN POSITION
-#         REMOVE A RAMDOM CUSTOMER
-
-#     """
-#     # Route constructor  with a problem resource and day
-
-#     def __init__(self, problem: SynConPVRP, res: Resource, day: Day):
-#         self.resource = res
-#         self.day = day
-#         # create the name of the route
-#         self.name = res.name + "-"+day.name
-#         # set the type of the route
-#         self.tp = ''
-#         if(isinstance(res, Truck)):
-#             self.tp = 'DelivRoute'
-#         else:
-#             self.tp = 'PreselRoute'
-
-#         # Initialize what can be assigned: depot, load, distance, fixed cost  and cost
-#         self.depot = problem.depot
-#         self.load = 0
-#         self.distance = 0
-#         self.fixCost = res.cf
-#         self.varCost = 0
-#         self.cost = res.cf
-#         # And finally the sueqence
-#         self.sequence = []
-#         self.sequence.append(problem.depot)
-#         self.sequence.append(problem.depot)
-
-#     # Inserting a customer in the first  position of the route
-#     def insertCusIni(self, problem: SynConPVRP, cus: Customer):
-#         # Insert the customer in the sequence
-#         self.sequence.insert(1, cus)
-#         # Update the variables
-#         # Demand accounts only for the part of the customer demand of a given day (drop size)
-#         self.load += cus.demand/cus.freq
-#         # distance update takes into account the customer position in the array of distances
-#         self.distance += problem.distances[0][cus.pos+1]
-#         self.varCost += self.distance*self.resource.cv
-#         self.cost += self.distance*self.resource.cv
