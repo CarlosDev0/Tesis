@@ -10,7 +10,8 @@ class GurobiProc:
 
     def gurobiSolver(self, districtMatix, instance, dv, quantityOfDistricts):
         self.m.Params.LogToConsole = 0  # To disable print solution into console
-        #self.m.Params.outputflag = 1
+        self.m.Params.outputflag = 1
+        self.m.Params.CSClientLog = 3
         A = np.zeros((len(instance.basicUnits), len(dv)))
         di = 0
         bi = 0

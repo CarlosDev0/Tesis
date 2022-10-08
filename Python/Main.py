@@ -31,24 +31,28 @@ if __name__ == "__main__":
     # vowel(3)
 
     # instance = SynConPVRP(
-    #     "E:/CARLOS/Ude@/TESIS/Desarrollo/Python/Instancias/instancia_270UB_Medellin.txt")
-    # instance = SynConPVRP(
     #     "E:/CARLOS/Ude@/TESIS/Desarrollo/Python/Instancias/instancia_16UBMedellin.txt")
 
     # instance = SynConPVRP(
     #     "E:/CARLOS/Ude@/TESIS/Desarrollo/Python/Instancias/instancia_29UBCopacabana.txt")
 
-    instance = SynConPVRP(
-        "E:/CARLOS/Ude@/TESIS/Desarrollo/Python/Instancias/instancia_44UBEnvigado.txt")
-
     # instance = SynConPVRP(
-    #     "E:/CARLOS/Ude@/TESIS/Desarrollo/Python/Instancias/instancia_78UB_Bello.txt")
+    #     "E:/CARLOS/Ude@/TESIS/Desarrollo/Python/Instancias/instancia_44UBEnvigado.txt")
 
     # instance = SynConPVRP(
     #     "E:/CARLOS/Ude@/TESIS/Desarrollo/Python/Instancias/instancia_60UB_Itagui.txt")
 
     # instance = SynConPVRP(
-    #    "E:/CARLOS/Ude@/TESIS/Desarrollo/Python/Instancias/instancia_104UB_Envi_Itagui.txt")
+    #     "E:/CARLOS/Ude@/TESIS/Desarrollo/Python/Instancias/instancia_78UB_Bello.txt")
+
+    # instance = SynConPVRP(
+    #     "E:/CARLOS/Ude@/TESIS/Desarrollo/Python/Instancias/instancia_104UB_Envi_Itagui.txt")
+
+    # instance = SynConPVRP(
+    #     "E:/CARLOS/Ude@/TESIS/Desarrollo/Python/Instancias/instancia_107UB_Bello.txt")
+
+    instance = SynConPVRP(
+        "E:/CARLOS/Ude@/TESIS/Desarrollo/Python/Instancias/instancia_270UB_Medellin.txt")
 
     instance.read_data()
     ip = InputValidator(instance)
@@ -56,7 +60,7 @@ if __name__ == "__main__":
     # print(instance.distances)
 
     # requiredDistricts = 7
-    iterations = 2000
+    iterations = 100
 
     #print("/////// Random Solution: /////")
     #randomSolver = RandomSolver(instance, instance.numDist)
